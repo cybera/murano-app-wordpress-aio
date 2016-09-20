@@ -1,0 +1,97 @@
+Version: 2
+
+Application:
+  ?:
+    type: ca.cybera.WordPressAIO
+  dbRootPassword: $.dbConfiguration.password
+  wpDbPassword: $.wpConfiguration.password
+  instance:
+    ?:
+      type: io.murano.resources.LinuxMuranoInstance
+    name: generateHostname($.instanceConfiguration.unitNamingPattern, 1)
+    flavor: $.instanceConfiguration.flavor
+    image: $.instanceConfiguration.osImage
+    keyname: $.instanceConfiguration.keyPair
+    assignFloatingIp: $.instanceConfiguration.assignFloatingIP
+
+Forms:
+  - dbConfiguration:
+      fields:
+        - name: title
+          type: string
+          required: false
+          hidden: true
+          descriptionTitle: Database Configuration
+          description: Specify the MySQL database properties
+        - name: password
+          type: password
+          label: MySQL Root Password
+          descriptionTitle: Password
+          description: >-
+            Please provide the root MySQL password.
+
+  - wpConfiguration:
+      fields:
+        - name: title
+          type: string
+          required: false
+          hidden: true
+          descriptionTitle: WordPress Configuration
+          description: Specify WordPress configuration properties
+        - name: password
+          type: password
+          label: WordPress MySQL Password
+          descriptionTitle: Password
+          description: >-
+            Please provide the password that is going to be used to connect to the database.
+
+  - instanceConfiguration:
+      fields:
+        - name: title
+          type: string
+          required: false
+          hidden: true
+          description: >-
+            Specify the instance parameters for the WordPress environment.
+        - name: flavor
+          type: flavor
+          label: Instance flavor
+          requirements:
+            min_disk: 20
+            min_vcpus: 1
+            min_memory_mb: 512
+          description: >-
+            Select the instance flavor.
+          required: false
+        - name: osImage
+          type: image
+          imageType: linux
+          label: Instance image
+          description: >-
+            Select an image. It must be Ubuntu-based.
+        - name: keyPair
+          type: keypair
+          label: Key Pair
+          description: >-
+            Select the Key Pair to control access to instances. You can login to
+            instances using this KeyPair after the deployment of application.
+          required: false
+        - name: assignFloatingIP
+          type: boolean
+          label: Assign Floating IP
+          description: >-
+            Set to true to assign a floating IP automatically.
+          initial: false
+          required: false
+        - name: unitNamingPattern
+          type: string
+          label: Instance Naming Pattern
+          required: false
+          maxLength: 64
+          regexpValidator: '^[a-zA-z][-_\w]*$'
+          errorMessages:
+            invalid: Just letters, numbers, underscores and hyphens are allowed.
+          helpText: Just letters, numbers, underscores and hyphens are allowed.
+          description: >-
+            Specify a string, that will be used in instance hostname.
+            Just A-Z, a-z, 0-9, dash and underline are allowed.
