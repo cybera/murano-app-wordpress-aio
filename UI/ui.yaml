@@ -1,5 +1,10 @@
 Version: 2
-
+Templates:
+  MySQLVolumes:
+    '/dev/vdd':
+        ?:
+          type: io.murano.resources.CinderVolume
+        size: 2
 Application:
   ?:
     type: ca.cybera.WordPressAIO
@@ -11,6 +16,7 @@ Application:
     name: generateHostname($.instanceConfiguration.unitNamingPattern, 1)
     flavor: $.instanceConfiguration.flavor
     image: $.instanceConfiguration.osImage
+    volumes: $MySQLVolumes
     keyname: $.instanceConfiguration.keyPair
     assignFloatingIp: $.instanceConfiguration.assignFloatingIP
 
@@ -69,6 +75,11 @@ Forms:
           label: Instance image
           description: >-
             Select an image. It must be Ubuntu-based.
+        - name: volSize
+          type: string
+          label: Volume size
+          description: >-
+            Size of the volume to be created for MySql database.Must be between 1 and 1024Gb
         - name: keyPair
           type: keypair
           label: Key Pair
