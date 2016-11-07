@@ -76,8 +76,11 @@ Forms:
           description: >-
             Select an image. It must be Ubuntu-based.
         - name: volSize
-          type: string
+          type: integer
           label: Volume size
+          required: true
+          minValue: 1
+          maxValue: 1024
           description: >-
             Size of the volume to be created for MySql database.Must be between 1 and 1024Gb
         - name: keyPair
