@@ -4,7 +4,7 @@ Templates:
     '/dev/vdd':
         ?:
           type: io.murano.resources.CinderVolume
-        size: 2
+        size: $.instanceConfiguration.volSize
 Application:
   ?:
     type: ca.cybera.WordPressAIO
