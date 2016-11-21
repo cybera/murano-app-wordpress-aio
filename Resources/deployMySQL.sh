@@ -19,7 +19,7 @@ sudo ln -s /opt/mysql_data/mysql /var/lib/mysql
 echo "$vol /opt/mysql_data ext3 defaults 0 1 "| sudo tee --append  /etc/fstab
 sudo chown -R mysql:mysql /opt/mysql_data/mysql
 
-echo "/opt/mysql_data/mysql r,
+echo "/opt/mysql_data/mysql/ r,
 /opt/mysql_data/mysql/** rwk," | sudo tee --append /etc/apparmor.d/local/usr.sbin.mysqld
 
 sudo service mysql start
