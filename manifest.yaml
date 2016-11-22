@@ -4,7 +4,7 @@ FullName: ca.cybera.WordPressAIO
 Name: WordPress All-in-One
 Description: |
  WordPress is a free and open source blogging tool and a content management system (CMS) based on PHP and MySQL.This application will store the MySQL databases on a volume.
-iAuthor: 'Cybera Inc'
+Author: 'Cybera Inc'
 Tags: [CMS, PHP, Web]
 Classes:
   ca.cybera.WordPressAIO: WordPressAIO.yaml
