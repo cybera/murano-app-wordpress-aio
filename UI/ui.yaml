@@ -82,13 +82,13 @@ Forms:
           minValue: 1
           maxValue: 1024
           description: >-
-            Size of the volume to be created for MySql database.Must be between 1 and 1024Gb
+            Size of the volume(in GB) to be created for MySql.
         - name: keyPair
           type: keypair
           label: Key Pair
           description: >-
-            Select the Key Pair to control access to instances. You can login to
-            instances using this KeyPair after the deployment of application.
+            Select the Key Pair to  access the instances. You can login to
+            instances using this Key Pair after the deployment of application.
           required: false
         - name: assignFloatingIP
           type: boolean
@@ -104,8 +104,8 @@ Forms:
           maxLength: 64
           regexpValidator: '^[a-zA-z][-_\w]*$'
           errorMessages:
-            invalid: Just letters, numbers, underscores and hyphens are allowed.
-          helpText: Just letters, numbers, underscores and hyphens are allowed.
+            invalid: Only letters, numbers, underscores and hyphens are allowed.
+          helpText: Only letters, numbers, underscores and hyphens are allowed.
           description: >-
             Specify a string, that will be used in instance hostname.
-            Just A-Z, a-z, 0-9, dash and underline are allowed.
+            Only A-Z, a-z, 0-9, dash and underline are allowed.
