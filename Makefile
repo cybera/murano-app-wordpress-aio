@@ -5,4 +5,4 @@ zip:
 	zip -r ca.cybera.WordPressAIO.zip *
 
 upload:
-	murano package-import --exists-action u ca.cybera.WordPressAIO.zip
+	murano package-import --is-public --exists-action u ca.cybera.WordPressAIO.zip
