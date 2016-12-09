@@ -1,13 +1,8 @@
 Version: 2
-Templates:
-  MySQLVolumes:
-    '/dev/vdd':
-        ?:
-          type: io.murano.resources.CinderVolume
-        size: $.instanceConfiguration.volSize
 Application:
   ?:
     type: ca.cybera.WordPressAIO
+  volSize: $.instanceConfiguration.volSize
   dbRootPassword: $.dbConfiguration.password
   wpDbPassword: $.wpConfiguration.password
   instance:
@@ -16,7 +11,6 @@ Application:
     name: generateHostname($.instanceConfiguration.unitNamingPattern, 1)
     flavor: $.instanceConfiguration.flavor
     image: $.instanceConfiguration.osImage
-    volumes: $MySQLVolumes
     keyname: $.instanceConfiguration.keyPair
     assignFloatingIp: $.instanceConfiguration.assignFloatingIP
 
