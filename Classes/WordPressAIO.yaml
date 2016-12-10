@@ -44,7 +44,7 @@ Methods:
               FromPort: 443
               IpProtocol: tcp
               External: true
-          - $._environment.securityGroupManager.addGroupIngress($securityGroupIngress,'MuranoSecurityGroup-Wordpress')
+          - $._environment.securityGroupManager.addGroupIngress($securityGroupIngress, 'MuranoSecurityGroup-Wordpress')
 
           # Launch the instance
           - $.instance.deploy()
