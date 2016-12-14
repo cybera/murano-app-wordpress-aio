@@ -14,12 +14,12 @@ Application:
     keyname: $.instanceConfiguration.keyPair
     assignFloatingIp: $.instanceConfiguration.assignFloatingIP
     securityGroupName: 'MuranoSecurityGroup-Wordpress'
-  volume:
-    ?:
-      type: io.murano.resources.CinderVolume
-    name: 'MuranoVolume-Wordpress'
-    size: $.volumeConfiguration.volumeSize
-
+    volumes:
+      '/dev/vdd':
+        ?:
+          type: io.murano.resources.CinderVolume
+        name: 'MuranoVolume-Wordpress'
+        size: $.volumeConfiguration.volumeSize
 Forms:
   - appConfiguration:
       fields:
