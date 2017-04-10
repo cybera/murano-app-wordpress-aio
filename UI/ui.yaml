@@ -133,5 +133,5 @@ Forms:
             invalid: Only letters, numbers, underscores and hyphens are allowed.
           helpText: Only letters, numbers, underscores and hyphens are allowed.
           description: >-
-            Specify a string, that will be used in instance hostname.
-            Only A-Z, a-z, 0-9, dash and underline are allowed.
+            Specify a string that will be used in instance hostname.
+            Only A-Z, a-z, 0-9, dash, and underline are allowed.

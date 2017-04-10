@@ -9,7 +9,8 @@ sudo mkfs -t ext4 $vol
 sudo mkdir /opt/mysql_data
 sudo mount $vol /opt/mysql_data
 
-sudo apt-get -y -q install mysql-server
+sudo apt-get -y update
+sudo apt-get -y -q install mysql-server-5.6
 sudo service mysql stop
 
 sudo cp -a /var/lib/mysql/ /opt/mysql_data/
