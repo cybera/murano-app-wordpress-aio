@@ -41,13 +41,12 @@ Forms:
           type: string
           required: false
           hidden: true
-          descriptionTitle: Database Configuration
+          label: Database Configuration
           description: Specify the MySQL database properties
         - name: password
           type: password
           regexpValidator: '^.{5,100}?$'
           label: MySQL Root Password
-          descriptionTitle: Password
           description: >-
             Please provide the root MySQL password.
           helpText: >-
@@ -58,13 +57,12 @@ Forms:
           type: string
           required: false
           hidden: true
-          descriptionTitle: WordPress Configuration
+          label: WordPress Configuration
           description: Specify WordPress configuration properties
         - name: password
           type: password
           regexpValidator: '^.{5,100}?$'
           label: WordPress MySQL Password
-          descriptionTitle: Password
           description: >-
             Please provide the password that is going to be used to connect to the database.
           helpText: >-
@@ -92,7 +90,7 @@ Forms:
           required: false
           hidden: true
           description: >-
-            Specify the instance parameters for the WordPress environment.
+            Specify the instance parameters.
         - name: flavor
           type: flavor
           label: Instance flavor
@@ -113,14 +111,14 @@ Forms:
           type: keypair
           label: Key Pair
           description: >-
-            Select the Key Pair to  access the instances. You can login to
+            Select the Key Pair to access the instances. You can login to
             instances using this Key Pair after the deployment of application.
           required: false
         - name: assignFloatingIP
           type: boolean
           label: Assign Floating IP
           description: >-
-            Set to true to assign a floating IP automatically.
+            Select to true to assign floating IP automatically
           initial: false
           required: false
         - name: unitNamingPattern
