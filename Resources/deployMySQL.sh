@@ -26,7 +26,7 @@ echo "/opt/mysql_data/mysql/ r,
 sudo service mysql restart
 
 
-mysql --user=root --password=%ROOT_MYSQL_PASSWORD% -e "CREATE DATABASE wordpress"
-mysql --user=root --password=%ROOT_MYSQL_PASSWORD% -e "CREATE USER 'wp_user'@'localhost' IDENTIFIED BY '%WP_MYSQL_PASSWORD%'"
-mysql --user=root --password=%ROOT_MYSQL_PASSWORD% -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'wp_user'@'localhost' WITH GRANT OPTION"
-mysql --user=root --password=%ROOT_MYSQL_PASSWORD% -e "FLUSH PRIVILEGES"
+mysql --user=root --password='%ROOT_MYSQL_PASSWORD%' -e "CREATE DATABASE wordpress"
+mysql --user=root --password='%ROOT_MYSQL_PASSWORD%' -e "CREATE USER 'wp_user'@'localhost' IDENTIFIED BY '%WP_MYSQL_PASSWORD%'"
+mysql --user=root --password='%ROOT_MYSQL_PASSWORD%' -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'wp_user'@'localhost' WITH GRANT OPTION"
+mysql --user=root --password='%ROOT_MYSQL_PASSWORD%' -e "FLUSH PRIVILEGES"
