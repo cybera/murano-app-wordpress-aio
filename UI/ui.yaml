@@ -5,6 +5,7 @@ Application:
   name: $.appConfiguration.name
   dbRootPassword: $.dbConfiguration.password
   wpDbPassword: $.wpConfiguration.password
+  wpUploadSize: $.wpConfiguration.uploadSize
   instance:
     ?:
       type: io.murano.resources.LinuxMuranoInstance
@@ -12,7 +13,7 @@ Application:
     flavor: $.instanceConfiguration.flavor
     image: $.instanceConfiguration.osImage
     keyname: $.instanceConfiguration.keyPair
-    assignFloatingIp: $.instanceConfiguration.assignFloatingIP
+    assignFloatingIp: $.appConfiguration.assignFloatingIP
     securityGroupName: 'MuranoSecurityGroup-Wordpress'
     volumes:
       '/dev/vdd':
@@ -35,6 +36,15 @@ Forms:
           description: >-
             Enter a desired name for the application. Just A-Z, a-z, 0-9, dash and
             underline are allowed
+        - name: assignFloatingIP
+          type: boolean
+          label: Assign Floating IP
+          description: >-
+             Select to true to assign floating IP automatically
+          initial: false
+          required: false
+          widgetMedia:
+            css: {all: ['muranodashboard/css/checkbox.css']}
   - dbConfiguration:
       fields:
         - name: title
@@ -67,6 +77,16 @@ Forms:
             Please provide the password that is going to be used to connect to the database.
           helpText: >-
             Password must be between 5 and 100 characters long.
+        - name: uploadSize
+          type: integer
+          label: Wordpress maximum upload file size (Mb)
+          required: true
+          minValue: 2
+          maxValue: 150
+          description: >-
+            Wordpress default max media file size.
+          helpText: >-
+            Size must be between 2 and 150 Mb.
   - volumeConfiguration:
       fields:
         - name: title
@@ -113,13 +133,6 @@ Forms:
           description: >-
             Select the Key Pair to access the instances. You can login to
             instances using this Key Pair after the deployment of application.
-          required: false
-        - name: assignFloatingIP
-          type: boolean
-          label: Assign Floating IP
-          description: >-
-            Select to true to assign floating IP automatically
-          initial: false
           required: false
         - name: unitNamingPattern
           type: string

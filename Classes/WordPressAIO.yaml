@@ -21,6 +21,8 @@ Properties:
   wpDbPassword:
     Contract: $.string().notNull()
 
+  wpUploadSize:
+    Contract: $.string().notNull()
 Methods:
   initialize:
     Body:
@@ -64,16 +66,22 @@ Methods:
           # Deploy WordPress
           - $replacements:
               "%WP_MYSQL_PASSWORD%": $.wpDbPassword
+              "%WP_UPLOAD_SIZE%": $.wpUploadSize
+              "%WP_FLOATING_IP%": $.instance.floatingIpAddress
           - $._environment.reporter.report($this, 'Deploying WordPress')
           - $file: sys:Resources.string('deployWordPress.sh').replace($replacements)
           - conf:Linux.runCommand($.instance.agent, $file)
           - $._environment.reporter.report($this, 'WordPress is installed')
 
-          # Assign Floating IP
+
+          - $file: sys:Resources.string('sleep.sh')
+          - conf:Linux.runCommand($.instance.agent, $file)
+
           - If: $.instance.assignFloatingIp
             Then:
               - $host: $.instance.floatingIpAddress
+              - $._environment.reporter.report($this, format('Wordpress is available at http://{0} or  http://{1}.dair-atir.canarie.ca/', $host, $host.replace('.', '-')))
             Else:
               - $host: $.instance.ipAddresses.first()
-          - $._environment.reporter.report($this, format('WordPress is available at http://{0}', $host))
+              - $._environment.reporter.report($this, format('WordPress is available at http://{0}', $host))
           - $.setAttr(deployed, true)
