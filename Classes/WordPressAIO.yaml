@@ -1,20 +1,18 @@
 Namespaces:
   =: ca.cybera
+  apps: io.murano.applications
   conf: io.murano.configuration
   res: io.murano.resources
   std: io.murano
   sys: io.murano.system
 
 Name: WordPressAIO
-Extends: std:Application
+
+Extends:
+  - apps:SingleServerApplication
+  - apps:OpenStackSecurityConfigurable
 
 Properties:
-  name:
-    Contract: $.string().notNull()
-
-  instance:
-    Contract: $.class(res:LinuxMuranoInstance).notNull()
-
   dbRootPassword:
     Contract: $.string().notNull()
 
@@ -23,65 +21,68 @@ Properties:
 
   wpUploadSize:
     Contract: $.string().notNull()
+
 Methods:
-  initialize:
+  getSecurityRules:
     Body:
-      - $._environment: $.find(std:Environment).require()
+      - Return:
+        - ToPort: 80
+          FromPort: 80
+          IpProtocol: tcp
+          External: true
+          Ethertype: IPv4
+        - ToPort: 443
+          FromPort: 443
+          IpProtocol: tcp
+          External: true
+          Ethertype: IPv4
+        - ToPort: 80
+          FromPort: 80
+          IpProtocol: tcp
+          External: true
+          Ethertype: IPv6
+        - ToPort: 443
+          FromPort: 443
+          IpProtocol: tcp
+          External: true
+          Ethertype: IPv6
 
-  deploy:
+  onInstallServer:
+    Arguments:
+      - server:
+          Contract: $.class(res:Instance).notNull()
+      - serverGroup:
+          Contract: $.class(apps:ServerGroup).notNull()
     Body:
-      - If: not $.getAttr(deployed, false)
-        Then:
-          # Create Security Group
-          - $._environment.reporter.report($this, 'Creating instance for WordPress')
-          - $securityGroupIngress:
-            - ToPort: 80
-              FromPort: 80
-              IpProtocol: tcp
-              External: true
-            - ToPort: 443
-              FromPort: 443
-              IpProtocol: tcp
-              External: true
-          - $._environment.securityGroupManager.addGroupIngress($securityGroupIngress, 'MuranoSecurityGroup-Wordpress')
+      - $file: sys:Resources.string('deployApache.sh')
+      - conf:Linux.runCommand($server.agent, $file)
 
-          # Launch the instance
-          - $.instance.deploy()
+      - $file: sys:Resources.string('deployMySQL.sh').replace({
+            "%ROOT_MYSQL_PASSWORD%" => $.dbRootPassword,
+            "%WP_MYSQL_PASSWORD%"   => $.wpDbPassword
+          })
+      - conf:Linux.runCommand($server.agent, $file)
 
-          # Deploy Apache
-          - $._environment.reporter.report($this, 'Instance is created. Deploying Apache.')
-          - $file: sys:Resources.string('deployApache.sh')
-          - conf:Linux.runCommand($.instance.agent, $file)
-          - $._environment.reporter.report($this, 'Apache is installed.')
+      - $file: sys:Resources.string('deployWordPress.sh').replace({
+            "%WP_MYSQL_PASSWORD%" => $.wpDbPassword,
+            "%WP_UPLOAD_SIZE%"    => $.wpUploadSize
+          })
+      - conf:Linux.runCommand($server.agent, $file)
 
-          # Deploy MySQL
-          - $._environment.reporter.report($this, 'Deploying MySQL')
-          - $replacements:
-              "%ROOT_MYSQL_PASSWORD%": $.dbRootPassword
-              "%WP_MYSQL_PASSWORD%": $.wpDbPassword
-          - $file: sys:Resources.string('deployMySQL.sh').replace($replacements)
-          - conf:Linux.runCommand($.instance.agent, $file)
-          - $._environment.reporter.report($this, 'MySQL is installed.')
-
-          # Deploy WordPress
-          - $replacements:
-              "%WP_MYSQL_PASSWORD%": $.wpDbPassword
-              "%WP_UPLOAD_SIZE%": $.wpUploadSize
-              "%WP_FLOATING_IP%": $.instance.floatingIpAddress
-          - $._environment.reporter.report($this, 'Deploying WordPress')
-          - $file: sys:Resources.string('deployWordPress.sh').replace($replacements)
-          - conf:Linux.runCommand($.instance.agent, $file)
-          - $._environment.reporter.report($this, 'WordPress is installed')
-
-
-          - $file: sys:Resources.string('sleep.sh')
-          - conf:Linux.runCommand($.instance.agent, $file)
-
-          - If: $.instance.assignFloatingIp
-            Then:
-              - $host: $.instance.floatingIpAddress
-              - $._environment.reporter.report($this, format('Wordpress is available at http://{0} or  http://{1}.dair-atir.canarie.ca/', $host, $host.replace('.', '-')))
-            Else:
-              - $host: $.instance.ipAddresses.first()
-              - $._environment.reporter.report($this, format('WordPress is available at http://{0}', $host))
-          - $.setAttr(deployed, true)
+  onCompleteConfiguration:
+    Arguments:
+      - server:
+          Contract:
+            - $.class(res:Instance).notNull()
+      - serverGroup:
+          Contract: $.class(apps:ServerGroup).notNull()
+      - failedServers:
+          Contract:
+            - $.class(res:Instance).notNull()
+    Body:
+      - $ips: $server.ipAddresses.first().selectMany(
+          switch(
+            $.matches("[a-f]+") => format('[{0}]', $),
+            true => $
+          )).select(format('http://{0}', $)).join(', ')
+      - $this.find(std:Environment).require().reporter.report($this, format('Wordpress is available at {0}', $ips))

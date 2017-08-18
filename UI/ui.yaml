@@ -1,41 +1,84 @@
-Version: 2
+Version: 2.2
+
+Templates:
+  customJoinNet:
+    - ?:
+        type: io.murano.resources.ExistingNeutronNetwork
+      internalNetworkName: $.instanceConfiguration.network[0]
+      internalSubnetworkName: $.instanceConfiguration.network[1]
+
 Application:
   ?:
     type: ca.cybera.WordPressAIO
-  name: $.appConfiguration.name
+    classVersion: 1.0.0
   dbRootPassword: $.dbConfiguration.password
   wpDbPassword: $.wpConfiguration.password
   wpUploadSize: $.wpConfiguration.uploadSize
-  instance:
+  server:
     ?:
       type: io.murano.resources.LinuxMuranoInstance
-    name: generateHostname($.instanceConfiguration.unitNamingPattern, 1)
+    name: "Wordpress"
     flavor: $.instanceConfiguration.flavor
     image: $.instanceConfiguration.osImage
     keyname: $.instanceConfiguration.keyPair
-    assignFloatingIp: $.appConfiguration.assignFloatingIP
-    securityGroupName: 'MuranoSecurityGroup-Wordpress'
+    availabilityZone: $.instanceConfiguration.availabilityZone
+    assignFloatingIp: $.instanceConfiguration.assignFloatingIP
+    networks:
+      useEnvironmentNetwork: $.instanceConfiguration.network[0]=null
+      useFlatNetwork: false
+      customNetworks: switch($.instanceConfiguration.network[0], $=null=>list(), $!=null=>$customJoinNet)
     volumes:
-      '/dev/vdd':
+      '/dev/sdd':
         ?:
           type: io.murano.resources.CinderVolume
         name: 'MuranoVolume-Wordpress'
         size: $.volumeConfiguration.volumeSize
+
 Forms:
-  - appConfiguration:
+  - instanceConfiguration:
       fields:
-        - name: license
+        - name: title
           type: string
-          description: Apache License, Version 2.0
-          hidden: true
           required: false
-        - name: name
-          type: string
-          label: Application Name
-          initial: Wordpress
+          hidden: true
           description: >-
-            Enter a desired name for the application. Just A-Z, a-z, 0-9, dash and
-            underline are allowed
+            Specify the instance parameters.
+        - name: flavor
+          type: flavor
+          label: Instance flavor
+          requirements:
+            min_disk: 20
+            min_vcpus: 1
+            min_memory_mb: 512
+          description: >-
+            Select the instance flavor.
+          required: false
+        - name: osImage
+          type: image
+          imageType: linux
+          label: Instance image
+          description: >-
+            Select an image. It must be Ubuntu-based.
+        - name: keyPair
+          type: keypair
+          label: Key Pair
+          description: >-
+            Select the Key Pair to access the instances. You can login to
+            instances using this Key Pair after the deployment of application.
+          required: false
+        - name: availabilityZone
+          type: azone
+          label: Availability zone
+          description: Select availability zone where application would be installed.
+          required: false
+        - name: network
+          type: network
+          label: Network
+          description: Select a network to join.
+          required: true
+          murano_networks: translate
+          allow_auto: false
+          include_subnets: false
         - name: assignFloatingIP
           type: boolean
           label: Assign Floating IP
@@ -43,8 +86,6 @@ Forms:
              Select to true to assign floating IP automatically
           initial: false
           required: false
-          widgetMedia:
-            css: {all: ['muranodashboard/css/checkbox.css']}
   - dbConfiguration:
       fields:
         - name: title
@@ -103,46 +144,3 @@ Forms:
           maxValue: 1024
           description: >-
             Size of the volume (in GB) to be created for MySQL.
-  - instanceConfiguration:
-      fields:
-        - name: title
-          type: string
-          required: false
-          hidden: true
-          description: >-
-            Specify the instance parameters.
-        - name: flavor
-          type: flavor
-          label: Instance flavor
-          requirements:
-            min_disk: 20
-            min_vcpus: 1
-            min_memory_mb: 512
-          description: >-
-            Select the instance flavor.
-          required: false
-        - name: osImage
-          type: image
-          imageType: linux
-          label: Instance image
-          description: >-
-            Select an image. It must be Ubuntu-based.
-        - name: keyPair
-          type: keypair
-          label: Key Pair
-          description: >-
-            Select the Key Pair to access the instances. You can login to
-            instances using this Key Pair after the deployment of application.
-          required: false
-        - name: unitNamingPattern
-          type: string
-          label: Instance Naming Pattern
-          required: false
-          maxLength: 64
-          regexpValidator: '^[a-zA-z][-_\w]*$'
-          errorMessages:
-            invalid: Only letters, numbers, underscores and hyphens are allowed.
-          helpText: Only letters, numbers, underscores and hyphens are allowed.
-          description: >-
-            Specify a string that will be used in instance hostname.
-            Only A-Z, a-z, 0-9, dash, and underline are allowed.

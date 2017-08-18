@@ -2,7 +2,7 @@
 
 if (python -mplatform | grep -qi Ubuntu)
 then #Ubuntu
-  apt-get install -y -q unzip php5-mysql mysql-client
+  apt-get install -y -q unzip php-mysql mysql-client
 
   wget http://wordpress.org/latest.zip
   unzip -q latest.zip -d /var/www/html/
@@ -25,13 +25,13 @@ then #Ubuntu
   echo "<VirtualHost *:80>
     ServerAdmin webmaster@localhost
     DocumentRoot /var/www/html
-    ServerName %WP_FLOATING_IP%
+    ServerName localhost
     <Directory /var/www/html/>
         AllowOverride All
     </Directory>
    ErrorLog ${APACHE_LOG_DIR}/error.log
    CustomLog ${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>" > /etc/apache2/000-default.conf
+</VirtualHost>" > /etc/apache2/sites-available/000-default.conf
   a2enmod rewrite
   touch /var/www/html/.htaccess
   chown :www-data /var/www/html/.htaccess
