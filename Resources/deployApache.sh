@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ -f /usr/local/bin/enableAutoUpdate ]]; then
+  /usr/local/bin/enableAutoUpdate
+fi
+
 if (python -mplatform | grep -qi Ubuntu)
 then #Ubuntu
   sudo apt-get update
